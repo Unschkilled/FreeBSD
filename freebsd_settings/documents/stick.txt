@@ -1,0 +1,44 @@
+Prepare: Load the Kernel modules for GELI and ZFS
+   # kldload opensolaris
+   # kldload zfs
+   # kldload geom_eli
+
+
+Set up encrypted ZFS on a USB stick ( with FreeBSD )
+
+1) Clear USB Stick
+   # sysctl kern.geom.debugflags=16
+   # dd if=/dev/urandom of=/dev/da0 
+
+2) Create 1 Partition ( + leave some space ) and Lable the USB device
+   # gpart destroy -F da0
+   # gpart create -s GPT /dev/da0
+   # gpart add -l STICK1 -t freebsd-zfs -a 10m -s 7G da0
+   # gpart show
+
+3) Set up GELI encryption for the 1 partition ( only passphrase protected )
+   # geli init /dev/gpt/STICK1
+   # geli attach /dev/gpt/STICK1
+
+4) Create the new zpool
+   # zpool create USBStick /dev/gpt/STICK1.eli
+
+5) "Save" pool on the Stick ( Make it removable )
+   # zpool export USBStick
+
+6) Set up mountpoint in fstab ( No dump / No mount on startup )
+   # mkdir /USBStick
+   fstab: /dev/gpt/STICK1   /USBStick   zfs    rw,noauto   0    0
+
+7) Detach GELI encryption
+   # geli detach /dev/gpt/STICK1
+
+
+Usage / Mount USB Stick again:
+   # geli attach /dev/gpt/STICK1
+   # zpool import USBStick
+   # --------------------
+   # --- do some work ---
+   # --------------------
+   # zpool export USBStick
+   # geli detach /dev/gpt/STICK1

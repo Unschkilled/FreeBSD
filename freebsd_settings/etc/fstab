@@ -1,0 +1,3 @@
+# Device		Mountpoint	FStype	Options		Dump	Pass#
+/dev/ada0p2		none		swap	sw		0	0
+/dev/gpt/STICK1.eli   	/USBStick   	zfs    	rw,noauto   	0    	0
