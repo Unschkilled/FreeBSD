@@ -27,6 +27,8 @@ if [ "$USER" = 'root' ]; then {
 		if [ -d $bdir ]; then {
 			mkdir $folder
 			zfs snapshot -r $sys_pool@backup
+                        zfs destroy $sys_pool/dump@backup
+                        zfs destroy $sys_pool/swap@backup
                         zfs send -Rv $sys_pool@backup | gzip > $folder/$sys_pool.zfs.gz
 			zfs destroy -r $sys_pool@backup
 			echo BACKUP: successfully created
